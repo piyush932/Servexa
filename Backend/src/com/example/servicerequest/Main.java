@@ -1,114 +1,47 @@
 package com.example.servicerequest;
 
+import com.example.servicerequest.model.Employee;
+import com.example.servicerequest.model.Priority;
+import com.example.servicerequest.model.ServiceRequest;
+import com.example.servicerequest.model.SupportAgent;
+
+import com.example.servicerequest.repository.InMemoryRequestRepository;
+
 import java.util.Scanner;
 
 public class Main {
-
-    static String[] requests = new String[20];
-    static int requestCount = 0;
-
     public static void main(String[] args) {
+        Employee employee = new Employee(
+                1L,
+                "Piyush Kumar Nayak",
+                "piyush@example.com",
+                "Engineering"
+        );
 
-        Scanner scanner = new Scanner(System.in);
+        SupportAgent agent = new SupportAgent(
+                2L,
+                "Support Agent",
+                "support@example.com",
+                "Platform Support"
+        );
 
-        while (true) {
+        ServiceRequest request = new ServiceRequest(
+                1001L,
+                "Unable to access internal portal",
+                "The employee cannot log in to the internal portal.",
+                "Access",
+                Priority.HIGH,
+                employee.getId()
+        );
 
-            System.out.println("\n===== SERVEXA =====");
-            System.out.println("1. Create Request");
-            System.out.println("2. View All Requests");
-            System.out.println("3. Search Request by ID");
-            System.out.println("4. Exit");
+        request.assignTo(agent.getId());
+        agent.assignRequest(request.getId());
 
-            System.out.print("Enter your choice: ");
+        InMemoryRequestRepository repository =
+                new InMemoryRequestRepository();
 
-            String input = scanner.nextLine();
+        repository.save(request);
 
-            switch (input) {
-
-                case "1":
-                    createRequest(scanner);
-                    break;
-
-                case "2":
-                    viewAllRequests();
-                    break;
-
-                case "3":
-                    System.out.print("Enter Request ID: ");
-
-                    String idInput = scanner.nextLine();
-                    int requestId = Integer.parseInt(idInput);
-
-                    searchById(requestId);
-                    break;
-
-                case "4":
-                    System.out.println("Exiting SERVEXA...");
-                    System.out.println("Requests: " + requestCount);
-                    scanner.close();
-                    return;
-
-                default:
-                    System.out.println("Invalid choice. Please enter 1-4.");
-            }
-        }
-    }
-
-    static void createRequest(Scanner scanner) {
-
-        System.out.print("Enter request title: ");
-
-        String title = scanner.nextLine();
-
-        if (title.trim().isEmpty()) {
-
-            System.out.println("Request title cannot be empty.");
-
-        } else {
-
-            requests[requestCount] = title;
-            requestCount++;
-
-            System.out.println("Request created successfully!");
-            System.out.println("Request ID: " + formatId(requestCount));
-        }
-    }
-
-    static void viewAllRequests() {
-
-        if (requestCount == 0) {
-
-            System.out.println("No requests found.");
-
-        } else {
-
-            System.out.println("Requests :-");
-
-            for (int i = 0; i < requestCount; i++) {
-
-                System.out.println(
-                        "ID: " + formatId(i + 1)
-                                + " | " + requests[i]
-                );
-            }
-        }
-    }
-
-    static void searchById(int requestId) {
-
-        if (requestId < 1 || requestId > requestCount) {
-
-            System.out.println("Request not found.");
-
-        } else {
-
-            System.out.println("Request found:");
-            System.out.println(requests[requestId - 1]);
-        }
-    }
-
-    static String formatId(int id) {
-
-        return String.format("REQ-%03d", id);
+        repository.findAll().forEach(System.out::println);
     }
 }
