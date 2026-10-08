@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ServiceRequest {
+public class ServiceRequest implements Comparable<ServiceRequest> {
     private final long id;
     private final String title;
     private final String description;
@@ -172,6 +172,11 @@ public class ServiceRequest {
                 ", assignedAgentId=" + assignedAgentId +
                 ", createdByUserId=" + createdByUserId +
                 '}';
+    }
+
+    @Override
+    public int compareTo(ServiceRequest other) {
+        return this.createdAt.compareTo(other.createdAt);
     }
 
 }

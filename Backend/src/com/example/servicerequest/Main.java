@@ -1,47 +1,66 @@
 package com.example.servicerequest;
 
-import com.example.servicerequest.model.Employee;
-import com.example.servicerequest.model.Priority;
-import com.example.servicerequest.model.ServiceRequest;
-import com.example.servicerequest.model.SupportAgent;
+import com.example.servicerequest.model.*;
 
 import com.example.servicerequest.repository.InMemoryRequestRepository;
+import com.example.servicerequest.repository.InMemoryServiceRequestRepository;
+import com.example.servicerequest.service.ServiceRequestService;
 
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Employee employee = new Employee(
+        InMemoryServiceRequestRepository repository =
+                new InMemoryServiceRequestRepository();
+
+        ServiceRequestService service =
+                new ServiceRequestService(repository);
+
+        service.create(new ServiceRequest(
                 1L,
-                "Piyush Kumar Nayak",
-                "piyush@example.com",
-                "Engineering"
-        );
-
-        SupportAgent agent = new SupportAgent(
-                2L,
-                "Support Agent",
-                "support@example.com",
-                "Platform Support"
-        );
-
-        ServiceRequest request = new ServiceRequest(
-                1001L,
-                "Unable to access internal portal",
-                "The employee cannot log in to the internal portal.",
+                "Portal login failure",
+                "Cannot log in",
                 "Access",
                 Priority.HIGH,
-                employee.getId()
+                100L
+        ));
+
+        service.create(new ServiceRequest(
+                2L,
+                "Slow network",
+                "Network latency issue",
+                "Network",
+                Priority.LOW,
+                101L
+        ));
+
+        service.create(new ServiceRequest(
+                3L,
+                "Data corruption",
+                "Critical data issue",
+                "Database",
+                Priority.CRITICAL,
+                102L
+        ));
+
+        System.out.println("Sorted by priority:");
+
+        service.sortedByPriorityDescending()
+                .forEach(System.out::println);
+
+        System.out.println("\nHigh priority open requests:");
+
+        service.highPriorityOpenRequests()
+                .forEach(System.out::println);
+
+        service.changeStatus(
+                1L,
+                RequestStatus.IN_PROGRESS
         );
 
-        request.assignTo(agent.getId());
-        agent.assignRequest(request.getId());
-
-        InMemoryRequestRepository repository =
-                new InMemoryRequestRepository();
-
-        repository.save(request);
-
-        repository.findAll().forEach(System.out::println);
+        System.out.println(
+                "\nTotal requests: "
+                        + service.totalRequests()
+        );
     }
 }
