@@ -1,0 +1,14 @@
+package com.example.servicerequest.exception;
+
+public class ResourceNotFoundException extends RuntimeException{
+    public ResourceNotFoundException(String message){
+        super(message);
+    }
+
+    public static ResourceNotFoundException forId(String entityName, long id) {
+        return new ResourceNotFoundException(
+                entityName + " not found with id: " + id
+        );
+    }
+
+}
